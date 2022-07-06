@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -6,25 +7,29 @@ public class UI_Health : MonoBehaviour
     [SerializeField] private PlayerHealth _playerHealth;
     [SerializeField] private Slider _healthSlider;
 
-    private float _changeSpeed = 0.5f;
+    private float _changeSpeed = 10f;
+    private Coroutine _changeHealthUI;
 
-    private void OnEnable()
+    private void Start()
     {
-        _playerHealth.Changed += OnHealthChanged;
+        _changeHealthUI = StartCoroutine(UIHealthChange());
     }
 
-    private void OnDisable()
+    private void ChangeVolume()
     {
-        _playerHealth.Changed -= OnHealthChanged;
+        StopCoroutine(_changeHealthUI);
+        _changeHealthUI = StartCoroutine(UIHealthChange());
     }
 
-    private void FixedUpdate()
+    private IEnumerator UIHealthChange()
     {
-        OnHealthChanged();
-    }
+        bool isWork = true;
 
-    private void OnHealthChanged()
-    {
-        _healthSlider.value = Mathf.MoveTowards(_healthSlider.value, _playerHealth.Health, _changeSpeed);
+        while (isWork)
+        {
+            _healthSlider.value = Mathf.MoveTowards(_healthSlider.value, _playerHealth.Health, _changeSpeed * Time.deltaTime);
+
+            yield return null;
+        }
     }
 }
